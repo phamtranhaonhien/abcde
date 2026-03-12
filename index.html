@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truyện Kiều - Nguyễn Du | Triển Lãm Nghệ Thuật</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+body {
+  background: linear-gradient(to bottom, #e6f0fa, #f5efe6);
+  font-family: "Times New Roman", serif;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s ease-out;
+}
+
+.gallery-card:hover {
+  transform: translateY(-8px);
+  transition: 0.3s;
+}
+</style>
+</head>
+
+<body class="text-gray-800">
+
+<!-- ===================== TRANG CHỦ ===================== -->
+<section id="home" class="h-screen flex flex-col items-center justify-center text-center px-6">
+  <h1 class="text-5xl font-bold text-[#3b5d7a] mb-6">Truyện Kiều</h1>
+  <p class="text-xl text-gray-700 mb-10">Nguyễn Du – Di Sản Nghệ Thuật Vượt Thời Đại</p>
+  <button onclick="startExhibition()" 
+    class="bg-[#3b5d7a] text-white px-8 py-3 rounded-full text-lg hover:bg-[#2f4f6f] transition">
+    Bắt Đầu Triển Lãm
+  </button>
+</section>
+
+<!-- ===================== TRIỂN LÃM ===================== -->
+<section id="gallerySection" class="hidden px-10 py-20">
+  <h2 class="text-4xl font-bold text-center text-[#3b5d7a] mb-16">
+    Hành Trình Nghệ Thuật Truyện Kiều
+  </h2>
+
+  <div id="gallery" class="grid md:grid-cols-3 gap-10"></div>
+</section>
+
+<!-- ===================== MODAL ===================== -->
+<div id="imageModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+  <div class="bg-[#f5efe6] max-w-4xl w-[90%] rounded-2xl shadow-2xl p-6 relative animate-fadeIn">
+    
+    <button onclick="closeModal()" 
+      class="absolute top-4 right-4 text-xl font-bold text-gray-700 hover:text-black">
+      ✕
+    </button>
+
+    <img id="modalImg" class="w-full max-h-[500px] object-contain rounded-xl mb-6"/>
+
+    <h2 id="modalTitle" class="text-2xl font-bold text-[#3b5d7a] mb-2"></h2>
+
+    <p id="modalDesc" class="text-gray-700 mb-4"></p>
+
+    <blockquote id="modalPoem" 
+      class="italic text-[#2f4f6f] border-l-4 border-[#3b5d7a] pl-4 whitespace-pre-line">
+    </blockquote>
+
+  </div>
+</div>
+
+<script>
+const galleryData = [
+  {
+    title: "Chị Em Thúy Kiều",
+    description: "Hai chị em Kiều mang vẻ đẹp thanh cao, tượng trưng cho nhan sắc và khí chất lý tưởng.",
+    poem: "Mai cốt cách, tuyết tinh thần,\nMỗi người một vẻ, mười phân vẹn mười.",
+    image: "https://i.pinimg.com/736x/7c/f2/b3/7cf2b31893189f885b88ff959f9f121c.jpg"
+  },
+  {
+    title: "Vẻ Đẹp Thúy Kiều",
+    description: "Nhan sắc Kiều khiến thiên nhiên cũng phải ghen hờn.",
+    poem: "Hoa ghen thua thắm, liễu hờn kém xanh.",
+    image: "https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/486576nmU/anh-mo-ta.png"
+  },
+  {
+    title: "Gặp Gỡ Kim Trọng",
+    description: "Cuộc gặp gỡ định mệnh mở đầu mối tình sâu đậm.",
+    poem: "Người quốc sắc, kẻ thiên tài,\nTình trong như đã, mặt ngoài còn e.",
+    image: "https://hocvancungricky.com/media/blog_banners/4_uegPsKz.jpg"
+  },
+  {
+    title: "Lầu Ngưng Bích",
+    description: "Kiều cô đơn giữa không gian mênh mông của nỗi buồn.",
+    poem: "Buồn trông cửa bể chiều hôm,\nThuyền ai thấp thoáng cánh buồm xa xa.",
+    image: "https://st.vndoc.com/data/image/2019/07/22/kieu-o-lau-ngung-bich.jpg"
+  },
+  {
+    title: "Kiều Gảy Đàn",
+    description: "Tiếng đàn chứa đựng nỗi đau và số phận bạc mệnh.",
+    poem: "Trong như tiếng hạc bay qua,\nĐục như tiếng suối mới sa nửa vời.",
+    image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiD8emrtSd71Sdxm-2E4POYNTc3JIF4eD4Ph96tTGZ2nCeuWpbg9nE7zqzwkaKdBgX-TrZnLEW33KpDDFh59WmUqFFYp7nbuvJJu4Ba49U3HK70x58ZXv29-ozgmcaAkU0RggcsBIlvHsg/s500/Ki%25E1%25BB%2581u+%25C4%2591%25C3%25A0n.jpg"
+  },
+  {
+    title: "Giá Trị Nhân Đạo",
+    description: "Di sản của Nguyễn Du còn vang vọng đến hôm nay.",
+    poem: "Thiện căn ở tại lòng ta,\nChữ tâm kia mới bằng ba chữ tài.",
+    image: "https://img.tripi.vn/cdn-cgi/image/width=700,height=700/https://gcs.tripi.vn/public-tripi/tripi-feed/img/473733DTN/bai-van-phan-tich-doan-trich-canh-ngay-xuan-cua-nguyen-du-so-10-352345.jpg"
+  }
+];
+
+function startExhibition() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("gallerySection").classList.remove("hidden");
+  renderGallery();
+}
+
+function renderGallery() {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
+
+  galleryData.forEach(item => {
+    const card = document.createElement("div");
+    card.className = "gallery-card bg-white rounded-2xl shadow-lg overflow-hidden cursor-pointer";
+
+    card.innerHTML = `
+      <div class="h-64 overflow-hidden">
+        <img src="${item.image}" 
+             class="w-full h-full object-cover hover:scale-105 transition duration-300"
+             onclick="openModal('${item.image}', '${item.title}', \`${item.description}\`, \`${item.poem}\`)"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-xl font-bold text-[#3b5d7a]">${item.title}</h3>
+      </div>
+    `;
+
+    gallery.appendChild(card);
+  });
+}
+
+function openModal(image, title, desc, poem) {
+  document.getElementById("modalImg").src = image;
+  document.getElementById("modalTitle").innerText = title;
+  document.getElementById("modalDesc").innerText = desc;
+  document.getElementById("modalPoem").innerText = poem;
+
+  const modal = document.getElementById("imageModal");
+  modal.classList.remove("hidden");
+  modal.classList.add("flex");
+}
+
+function closeModal() {
+  const modal = document.getElementById("imageModal");
+  modal.classList.add("hidden");
+  modal.classList.remove("flex");
+}
+</script>
+
+
+
+
+
+<script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
+<script>
+  new CozeWebSDK.WebChatClient({
+    config: {
+      bot_id: '7612500189799317509',
+    },
+    componentProps: {
+      title: 'Coze',
+    },
+    auth: {
+      type: 'token',
+      token: 'pat_********',
+      onRefreshToken: function () {
+        return 'pat_********'
+      }
+    }
+  });
+</script>
+
+</body>
+</html>
